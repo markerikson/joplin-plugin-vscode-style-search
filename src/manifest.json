@@ -1,0 +1,15 @@
+{
+	"manifest_version": 1,
+	"id": "com.isquaredsoftware.joplin-plugin-full-file-search",
+	"app_min_version": "2.13",
+	"version": "1.0.0",
+	"name": "Full File Search",
+	"description": "A plugin that provides a full file search UI patterned after VS Code",
+	"author": "Mark Erikson",
+	"homepage_url": "",
+	"repository_url": "https://github.com/markerikson/joplin-plugin-full-file-search",
+	"keywords": [],
+	"categories": [],
+	"screenshots": [],
+	"icons": {}
+}
