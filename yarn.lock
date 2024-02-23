@@ -3046,6 +3046,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"channel-rpc@npm:^0.2.6":
+  version: 0.2.6
+  resolution: "channel-rpc@npm:0.2.6"
+  checksum: 10c0/e943c3f3d55808482cbbf723fb87904c649d27776e4909ff1d18d3bf8036b8319311dab696f0cb3e75856863532251157c6f31874ec9956ead449c9012c40361
+  languageName: node
+  linkType: hard
+
 "character-entities@npm:^2.0.0":
   version: 2.0.2
   resolution: "character-entities@npm:2.0.2"
@@ -5951,9 +5958,11 @@ __metadata:
     "@types/react": "npm:^18.2.55"
     "@types/react-dom": "npm:^18.2.19"
     chalk: "npm:^4.1.0"
+    channel-rpc: "npm:^0.2.6"
     copy-webpack-plugin: "npm:^11.0.0"
     fs-extra: "npm:^10.1.0"
     glob: "npm:^8.0.3"
+    prettier: "npm:^3.2.5"
     react: "npm:^18.2.0"
     react-dom: "npm:^18.2.0"
     tar: "npm:^6.1.11"
@@ -7751,6 +7760,15 @@ __metadata:
   bin:
     prebuild-install: bin.js
   checksum: 10c0/6dc70f36b0f4adcb2fe0ed38d874ab28b571fb1a9725d769e8ba3f64a15831e58462de09f3e6e64569bcc4a3e03b9328b56faa0d45fe10ae1574478814536c76
+  languageName: node
+  linkType: hard
+
+"prettier@npm:^3.2.5":
+  version: 3.2.5
+  resolution: "prettier@npm:3.2.5"
+  bin:
+    prettier: bin/prettier.cjs
+  checksum: 10c0/ea327f37a7d46f2324a34ad35292af2ad4c4c3c3355da07313339d7e554320f66f65f91e856add8530157a733c6c4a897dc41b577056be5c24c40f739f5ee8c6
   languageName: node
   linkType: hard
 
