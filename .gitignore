@@ -1,7 +1,8 @@
 dist/
 node_modules/
 publish/
-
+dist*/
+publish*/
 
 .cache
 .yarnrc
