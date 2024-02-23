@@ -16,7 +16,11 @@
   ],
   "devDependencies": {
     "@joplin/lib": "~2.9",
+    "@rspack/cli": "^0.5.4",
+    "@rspack/core": "^0.5.4",
     "@types/node": "^18.7.13",
+    "@types/react": "^18.2.55",
+    "@types/react-dom": "^18.2.19",
     "chalk": "^4.1.0",
     "copy-webpack-plugin": "^11.0.0",
     "fs-extra": "^10.1.0",
@@ -27,5 +31,9 @@
     "webpack": "^5.74.0",
     "webpack-cli": "^4.10.0"
   },
-  "packageManager": "yarn@4.1.0"
+  "packageManager": "yarn@4.1.0",
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  }
 }
