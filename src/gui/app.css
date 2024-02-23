@@ -1,0 +1,6 @@
+.container {
+  background-color: var(--joplin-background-color);
+  color: red;
+  font-size: 42;
+  font-family: var(--joplin-font-family);
+}
