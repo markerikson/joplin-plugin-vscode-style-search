@@ -2,9 +2,9 @@
   "name": "joplin-plugin-full-file-search",
   "version": "0.0.1",
   "scripts": {
-    "build": "RSPACK_CONFIG_VALIDATE=loose  webpack --env joplin-plugin-config=buildMain && webpack --env joplin-plugin-config=buildExtraScripts && webpack --env joplin-plugin-config=createArchive",
+    "build": "RSPACK_CONFIG_VALIDATE=loose rspack --env joplin-plugin-config=buildMain && rspack --env joplin-plugin-config=buildExtraScripts && rspack --env joplin-plugin-config=createArchive",
     "prepare": "npm run build",
-    "updateVersion": "webpack --env joplin-plugin-config=updateVersion",
+    "updateVersion": "rspack --env joplin-plugin-config=updateVersion",
     "update": "npm install -g generator-joplin && yo joplin --node-package-manager npm --update --force"
   },
   "license": "MIT",
