@@ -10,7 +10,26 @@ export interface ComplexTerm {
   type: 'regex' | 'text'
   value: string
   scriptType: any
-  valueRegex?: RegExp
+  valueRegex?: string
+}
+
+function pregQuote(str: string, delimiter = '') {
+  return `${str}`.replace(new RegExp(`[.\\\\+*?\\[\\^\\]$(){}=!<>|:\\${delimiter || ''}-]`, 'g'), '\\$&')
+}
+
+function queryTermToRegex(term: any) {
+  while (term.length && term.indexOf('*') === 0) {
+    term = term.substr(1)
+  }
+
+  let regexString = pregQuote(term)
+  if (regexString[regexString.length - 1] === '*') {
+    regexString =
+      `${regexString.substr(0, regexString.length - 2)}[^${pregQuote(' \t\n\r,.,+-*?!={}<>|:"\'()[]')}]` + '*?'
+    // regexString = regexString.substr(0, regexString.length - 2) + '.*?';
+  }
+
+  return regexString
 }
 
 function parseQuery(query: string) {
@@ -61,7 +80,7 @@ function parseQuery(query: string) {
           type: 'regex',
           value: term,
           scriptType: 'en', // scriptType(term),
-          valueRegex: this.queryTermToRegex(term),
+          valueRegex: queryTermToRegex(term),
         }
       } else {
         terms[col][i] = { type: 'text', value: term, scriptType: 'en' /*scriptType(term)*/ }
@@ -88,7 +107,9 @@ function parseQuery(query: string) {
 
   allTerms = allTerms.map((x) => {
     if (x.name === 'text' || x.name === 'title' || x.name === 'body') {
-      return { ...x, value: this.normalizeText_(x.value) }
+      return x
+      // TODO normalize text
+      // return { ...x, value: this.normalizeText_(x.value) }
     }
     return x
   })
