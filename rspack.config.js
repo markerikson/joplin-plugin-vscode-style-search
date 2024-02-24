@@ -255,11 +255,23 @@ const baseConfig = {
           },
         },
       },
-      // {
-      // 	test: /\.tsx?$/,
-      // 	use: 'ts-loader',
-      // 	exclude: /node_modules/,
-      // },
+      {
+        test: /\.css$/,
+        use: [
+          {
+            loader: 'postcss-loader',
+            options: {
+              postcssOptions: {
+                plugins: {
+                  tailwindcss: {},
+                  autoprefixer: {},
+                },
+              },
+            },
+          },
+        ],
+        type: 'css/auto',
+      },
     ],
   },
 }
