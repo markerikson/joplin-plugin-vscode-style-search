@@ -3,6 +3,7 @@ import { useState, useEffect, useLayoutEffect, useRef } from 'react'
 import * as ReactDOM from 'react-dom/client'
 import { marked } from 'marked'
 import { convert as htmlToText } from 'html-to-text'
+import { useAsync } from 'react-use'
 
 import { ChannelClient, ChannelErrors, PostMessageTarget } from '../shared/channelRpc'
 
@@ -75,7 +76,17 @@ const client = new ChannelClient<HandlerType>({
 function App() {
   const [searchText, setSearchText] = useState('')
   const [titlesOnly, setTitlesOnly] = useState(false)
-  const [searchResults, setSearchResults] = useState<Note[]>([])
+
+  const { value: searchResults, loading } = useAsync(async () => {
+    let notes: Note[] = []
+    console.log('Search value: ', searchText)
+    if (searchText) {
+      notes = await client.stub.search({ searchText: searchText, titlesOnly })
+      console.log('Search notes: ', notes)
+    }
+
+    return notes
+  }, [searchText, titlesOnly])
 
   const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target
@@ -113,80 +124,92 @@ function App() {
     document.documentElement.classList.add(themeColor)
   }, [])
 
-  useEffect(() => {
-    const fetchNotes = async () => {
-      let notes: Note[] = []
-      console.log('Search value: ', searchText)
-      if (searchText) {
-        notes = await client.stub.search({ searchText: searchText, titlesOnly })
-        console.log('Search notes: ', notes)
-      }
+  // useEffect(() => {
+  //   const fetchNotes = async () => {
+  //     let notes: Note[] = []
+  //     console.log('Search value: ', searchText)
+  //     if (searchText) {
+  //       notes = await client.stub.search({ searchText: searchText, titlesOnly })
+  //       console.log('Search notes: ', notes)
+  //     }
 
-      setSearchResults(notes)
-    }
-    fetchNotes()
-  }, [searchText, titlesOnly])
+  //     setSearchResults(notes)
+  //   }
+  //   fetchNotes()
+  // }, [searchText, titlesOnly])
 
   const parsedKeywords = keywords(searchText)
 
   console.log('Keywords: ', parsedKeywords)
 
-  const renderedNotes = searchResults.map((note) => {
-    const htmlContent = marked.parse(note.body) as string
-    const strippedContent = htmlToText(htmlContent)
+  let rendered: React.ReactNode = null
 
-    const indices: number[][] = []
+  if (!searchText) {
+    rendered = 'Enter a search term'
+  } else if (loading) {
+    rendered = 'Loading...'
+  } else if (searchResults.length === 0) {
+    rendered = 'No results found'
+  } else {
+    const renderedNotes = searchResults.map((note) => {
+      const htmlContent = marked.parse(note.body) as string
+      const strippedContent = htmlToText(htmlContent)
 
-    let fragments = ''
+      const indices: number[][] = []
 
-    for (let keyword of parsedKeywords) {
-      let valueRegex: string | undefined = undefined
-      if (typeof keyword === 'string') {
-        valueRegex = keyword
-      } else if (keyword.type === 'text') {
-        valueRegex = keyword.value
-      } else if (keyword.valueRegex) {
-        valueRegex = keyword.valueRegex
-      }
+      let fragments = ''
 
-      if (valueRegex) {
-        for (const match of strippedContent.matchAll(new RegExp(valueRegex, 'ig'))) {
-          // Populate 'indices' with [begin index, end index] of each note fragment
-          // Begins at the regex matching index, ends at the next whitespace after seeking 15 characters to the right
-          indices.push([match.index, nextWhitespaceIndex(strippedContent, match.index + match[0].length + 15)])
-          if (indices.length > 20) break
+      for (let keyword of parsedKeywords) {
+        let valueRegex: string | undefined = undefined
+        if (typeof keyword === 'string') {
+          valueRegex = keyword
+        } else if (keyword.type === 'text') {
+          valueRegex = keyword.value
+        } else if (keyword.valueRegex) {
+          valueRegex = keyword.valueRegex
         }
-      } else {
-        fragments = 'N/A'
+
+        if (valueRegex) {
+          for (const match of strippedContent.matchAll(new RegExp(valueRegex, 'ig'))) {
+            // Populate 'indices' with [begin index, end index] of each note fragment
+            // Begins at the regex matching index, ends at the next whitespace after seeking 15 characters to the right
+            indices.push([match.index, nextWhitespaceIndex(strippedContent, match.index + match[0].length + 15)])
+            if (indices.length > 20) break
+          }
+        } else {
+          fragments = 'N/A'
+        }
+        // if (typeof keyword !== 'string' && 'valueRegex' in keyword) {
+        //   const { valueRegex } = keyword
+
+        // } else {
+        //   fragments = 'N/A'
+        // }
       }
-      // if (typeof keyword !== 'string' && 'valueRegex' in keyword) {
-      //   const { valueRegex } = keyword
 
-      // } else {
-      //   fragments = 'N/A'
-      // }
-    }
+      console.log('Indices: ', note.title, indices)
 
-    console.log('Indices: ', note.title, indices)
+      const mergedIndices = mergeOverlappingIntervals(indices, 3)
+      fragments = mergedIndices.map((f: any) => strippedContent.slice(f[0], f[1])).join(' ... ')
+      // Add trailing ellipsis if the final fragment doesn't end where the note is ending
+      if (mergedIndices.length && mergedIndices[mergedIndices.length - 1][1] !== strippedContent.length)
+        fragments += ' ...'
 
-    const mergedIndices = mergeOverlappingIntervals(indices, 3)
-    fragments = mergedIndices.map((f: any) => strippedContent.slice(f[0], f[1])).join(' ... ')
-    // Add trailing ellipsis if the final fragment doesn't end where the note is ending
-    if (mergedIndices.length && mergedIndices[mergedIndices.length - 1][1] !== strippedContent.length)
-      fragments += ' ...'
+      return (
+        <li key={note.id}>
+          {note.title}
+          <div>
+            <b>Content</b>: {strippedContent.slice(0, 100)}
+          </div>
+          <div>
+            <b>Fragments:</b> {fragments}
+          </div>
+        </li>
+      )
+    })
 
-    return (
-      <li key={note.id}>
-        {note.title}
-        <div>
-          <b>Content</b>: {strippedContent.slice(0, 100)}
-        </div>
-        <div>
-          <b>Fragments:</b> {fragments}
-        </div>
-      </li>
-    )
-  })
+    rendered = <ul>{renderedNotes}</ul>
+  }
 
   return (
     <div className={searchStyles.SearchFiles}>
@@ -201,7 +224,7 @@ function App() {
       </div>
       <div>
         Results:
-        <ul>{renderedNotes}</ul>
+        {rendered}
       </div>
     </div>
   )
