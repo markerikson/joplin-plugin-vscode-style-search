@@ -1,0 +1,97 @@
+.SearchFiles {
+  height: 100%;
+  border-radius: 0.5rem;
+  background-color: var(--body-bgcolor);
+  padding: 0.5rem 0;
+}
+
+.CheckboxWrapper {
+  flex: 0 0 auto;
+  margin: 0.5rem;
+}
+
+.CheckboxWrapper input {
+  border: 1px solid var(--input-border);
+}
+
+.Content {
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  overflow-x: hidden;
+}
+
+.InputWrapper {
+  height: 1.75rem;
+  display: flex;
+  align-items: center;
+  padding: 0 0 0 0;
+  margin: 0 0.5rem;
+  background-color: var(--background-color-inputs);
+  border: 2px solid transparent;
+  border-radius: 0.5rem;
+}
+.InputWrapper:focus-within {
+  border-color: var(--primary-accent);
+}
+.InputWrapper[data-error],
+.InputWrapper[data-error]:focus-within {
+  background-color: var(--background-color-error);
+  border-color: var(--border-color-error);
+}
+
+.Icon {
+  flex: 0 0 1.75rem;
+  width: 1.75rem;
+  height: 1.75rem;
+  padding: 0.25rem;
+  display: inline-block;
+  color: var(--color-dim);
+}
+
+.Input {
+  min-width: 0;
+  flex: 1 1 auto;
+  background: none;
+  color: var(--color-default);
+  font-size: var(--font-size-regular);
+
+  /* Override overly-specific style from legacy app */
+  box-shadow: none !important;
+  outline: none !important;
+  border: none !important;
+  margin: 0;
+  padding: 0;
+}
+
+.SearchFilterButton,
+.SelectedSearchFilterButton {
+  height: 1.25rem;
+  width: 1.25rem;
+  margin-right: 0.25rem;
+  border-radius: 0.25rem;
+  transition-duration: 200ms;
+  border: 1px solid;
+}
+
+.SearchFilterButton {
+  background-color: transparent;
+  border-color: transparent;
+}
+
+.SearchFilterButton:hover {
+  background-color: var(--checkbox);
+}
+
+.SelectedSearchFilterButton {
+  background-color: var(--color-hit-counts-label-background-3);
+  border-color: var(--primary-accent);
+}
+
+.SearchFilterIcon {
+  height: 1.125rem;
+  width: 1.125rem;
+  padding: 0.125rem;
+}

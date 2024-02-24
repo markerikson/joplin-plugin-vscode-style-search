@@ -6,6 +6,12 @@ import { ChannelClient, ChannelErrors, PostMessageTarget } from '../shared/chann
 
 import type { HandlerType, Note } from '../index'
 
+import './tailwind.css'
+import './variables.css'
+import searchStyles from './SearchFiles.module.css'
+
+console.log('Search styles: ', searchStyles)
+
 const target: PostMessageTarget = {
   postMessage: async (message: any) => {
     // console.log('Client postMessage: ', message)
@@ -61,10 +67,10 @@ function App() {
   })
 
   return (
-    <div>
+    <div className={searchStyles.SearchFiles}>
       <div style={{ fontWeight: 700, fontSize: 32 }}>Hello World from React + RSPack!!</div>
-      <div>
-        <input type="text" onChange={handleChange} value={searchText} />
+      <div className={searchStyles.InputWrapper}>
+        <input type="text" className={searchStyles.Input} onChange={handleChange} value={searchText} />
       </div>
       <div>
         <label>

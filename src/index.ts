@@ -1,5 +1,6 @@
 import joplin from 'api'
-import internal = require('stream')
+import type * as FSType from 'fs-extra'
+// import * as fs from 'node:fs'
 import { ChannelServer, PostMessageTarget } from './shared/channelRpc'
 import { RpcMethods } from './shared/rpcTypes'
 
@@ -87,6 +88,17 @@ joplin.plugins.register({
     // eslint-disable-next-line no-console
     console.info('Hello world. Test plugin started! 42')
 
+    const pluginDir = await joplin.plugins.installationDir()
+    console.log('Plugin directory: ', pluginDir)
+
+    const fs: typeof FSType = joplin.require('fs-extra')
+
+    const guiFolder = pluginDir + '/gui/'
+
+    const files = await fs.promises.readdir(pluginDir + '/gui/')
+    console.log('Plugin files: ', files)
+    const cssFiles = files.filter((file) => file.endsWith('.css')).map((file) => 'gui/' + file)
+
     // Create the panel object
     const panel = await joplin.views.panels.create('panel_1')
 
@@ -98,7 +110,11 @@ joplin.plugins.register({
 		`,
     )
 
-    await joplin.views.panels.addScript(panel, 'gui/app.css')
+    // await joplin.views.panels.addScript(panel, 'gui/index.css')
+    // await joplin.views.panels.addScript(panel, 'gui/app.css')
+    for (const file of cssFiles) {
+      await joplin.views.panels.addScript(panel, file)
+    }
     await joplin.views.panels.addScript(panel, 'gui/index.js')
 
     const target: PostMessageTarget = {
