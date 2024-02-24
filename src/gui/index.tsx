@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useLayoutEffect, useRef } from 'react'
 import * as ReactDOM from 'react-dom/client'
 
 import { ChannelClient, ChannelErrors, PostMessageTarget } from '../shared/channelRpc'
@@ -26,6 +26,16 @@ const target: PostMessageTarget = {
   },
 }
 
+function parseColor(input: string) {
+  // const div = document.createElement('div')
+  // div.style.color = input
+  // const actualColor = getComputedStyle(div).color
+  // console.log('Actual color: ', actualColor)
+  const m = input.match(/^rgba?\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+),?\s*(\d+)?\)$/i)
+  if (m) return [m[1], m[2], m[3]]
+  else throw new Error('Colour ' + input + ' could not be parsed.')
+}
+
 // Create a ChannelClient instance
 const client = new ChannelClient<HandlerType>({
   target,
@@ -47,6 +57,32 @@ function App() {
     const { checked } = e.target
     setTitlesOnly(checked)
   }
+
+  const initializedRef = useRef(false)
+
+  useLayoutEffect(() => {
+    if (initializedRef.current) {
+      return
+    }
+    initializedRef.current = true
+
+    const computedStyle = window.getComputedStyle(document.documentElement)
+
+    console.log('Computed style: ', computedStyle)
+
+    const backgroundColor = computedStyle.getPropertyValue('background-color')
+
+    console.log('Background color: ', backgroundColor)
+    const parsedColor = parseColor(backgroundColor)
+
+    console.log('Parsed color: ', parsedColor)
+    let themeColor = 'theme-dark'
+    if (parsedColor[0] === '0' && parsedColor[1] === '0' && parsedColor[2] === '0') {
+      themeColor = 'theme-light'
+    }
+
+    document.documentElement.classList.add(themeColor)
+  }, [])
 
   useEffect(() => {
     const fetchNotes = async () => {

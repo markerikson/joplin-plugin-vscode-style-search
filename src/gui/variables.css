@@ -149,8 +149,8 @@
   --tab-standard-color: rgba(255, 255, 255, 0.5);
 
   /* Core classes (Dark) */
-  --body-bgcolor: var(--theme-base-95);
-  --body-color: var(--color-default);
+  --body-bgcolor: var(--joplin-background-color);/*var(--theme-base-95);*/
+  --body-color: var(--joplin-color);/*var(--color-default);*/
   --body-sub-color: var(--grey-40);
   --buttontext-color: #f4f8fa;
   --checkbox-border: var(--input-border);
@@ -695,8 +695,8 @@
   --tab-standard-color: rgba(0, 0, 0, 0.5);
 
   /* Core classes (Light) */
-  --body-bgcolor: var(--theme-base-100); /* bg text */
-  --body-color: var(--color-default);
+  --body-bgcolor: var(--joplin-background-color);/*var(--theme-base-100); *//* bg text */
+  --body-color: var(--joplin-color);/*var(--color-default)*/;
   --body-sub-color: #a9a9b1;
   --buttontext-color: #f4f8fa;
   --checkbox-border: var(--input-border);
