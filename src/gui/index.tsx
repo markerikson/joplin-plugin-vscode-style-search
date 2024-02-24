@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import * as ReactDOM from 'react-dom/client'
 
 import { ChannelClient, ChannelErrors, PostMessageTarget } from '../shared/channelRpc'
@@ -35,16 +35,26 @@ function App() {
   const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target
     setSearchText(value)
-
-    let notes: Note[] = []
-    console.log('Search value: ', value)
-    if (value) {
-      notes = await client.stub.search({ searchText: value, titlesOnly })
-      console.log('Search notes: ', notes)
-    }
-
-    setSearchResults(notes)
   }
+
+  const handleTitlesOnlyChanged = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { checked } = e.target
+    setTitlesOnly(checked)
+  }
+
+  useEffect(() => {
+    const fetchNotes = async () => {
+      let notes: Note[] = []
+      console.log('Search value: ', searchText)
+      if (searchText) {
+        notes = await client.stub.search({ searchText: searchText, titlesOnly })
+        console.log('Search notes: ', notes)
+      }
+
+      setSearchResults(notes)
+    }
+    fetchNotes()
+  }, [searchText, titlesOnly])
 
   const renderedNotes = searchResults.map((note) => {
     return <li key={note.id}>{note.title}</li>
@@ -55,6 +65,11 @@ function App() {
       <div style={{ fontWeight: 700, fontSize: 32 }}>Hello World from React + RSPack!!</div>
       <div>
         <input type="text" onChange={handleChange} value={searchText} />
+      </div>
+      <div>
+        <label>
+          <input type="checkbox" checked={titlesOnly} onChange={handleTitlesOnlyChanged}></input>Titles Only{' '}
+        </label>
       </div>
       <div>
         Results:
