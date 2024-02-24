@@ -403,6 +403,8 @@ function main(environ) {
   const configName = environ['joplin-plugin-config']
   if (!configName) throw new Error('A config file must be specified via the --joplin-plugin-config flag')
 
+  console.log('Building: ', `"${configName}"`)
+
   // Webpack configurations run in parallel, while we need them to run in
   // sequence, and to do that it seems the only way is to run webpack multiple
   // times, with different config each time.
@@ -447,9 +449,7 @@ module.exports = (env) => {
   let exportedConfigs = []
 
   try {
-    console.log('Creating configs: ', env)
     exportedConfigs = main(env)
-    console.log('Configs: ', exportedConfigs)
   } catch (error) {
     console.error(error.message)
     process.exit(1)
