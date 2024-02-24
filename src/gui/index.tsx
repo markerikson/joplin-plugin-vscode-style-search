@@ -1,6 +1,8 @@
 import * as React from 'react'
 import { useState, useEffect, useLayoutEffect, useRef } from 'react'
 import * as ReactDOM from 'react-dom/client'
+import { marked } from 'marked'
+import { convert as htmlToText } from 'html-to-text'
 
 import { ChannelClient, ChannelErrors, PostMessageTarget } from '../shared/channelRpc'
 
@@ -99,7 +101,15 @@ function App() {
   }, [searchText, titlesOnly])
 
   const renderedNotes = searchResults.map((note) => {
-    return <li key={note.id}>{note.title}</li>
+    const htmlContent = marked.parse(note.body) as string
+    const strippedContent = htmlToText(htmlContent)
+    console.log('Stripped content: ', strippedContent)
+    return (
+      <li key={note.id}>
+        {note.title}
+        <div>Content: {strippedContent.slice(0, 100)}</div>
+      </li>
+    )
   })
 
   return (
