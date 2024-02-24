@@ -1,7 +1,82 @@
+/**
+Defaults:
+
+root {
+    --joplin-font-size: 12px;
+    --joplin-toolbar-icon-size: 18px;
+    --joplin-note-viewer-font-size: 15px;
+    --joplin-font-family: Roboto;
+    --joplin-margin: 15px;
+    --joplin-item-margin-top: 10px;
+    --joplin-item-margin-bottom: 10px;
+    --joplin-disabled-opacity: 0.3;
+    --joplin-button-min-width: 50px;
+    --joplin-button-min-height: 30px;
+    --joplin-editor-font-size: 12px;
+    --joplin-text-area-line-height: 17px;
+    --joplin-line-height: 1.6em;
+    --joplin-header-button-h-padding: 6px;
+    --joplin-toolbar-height: 26px;
+    --joplin-toolbar-padding: 6px;
+    --joplin-main-padding: 12px;
+    --joplin-top-row-height: 50px;
+    --joplin-editor-padding-left: 8px;
+    --joplin-margin-right: 15px;
+    --joplin-margin-left: 15px;
+    --joplin-margin-top: 15px;
+    --joplin-margin-bottom: 15px;
+    --joplin-background-color: #ffffff;
+    --joplin-background-color-transparent: rgba(255,255,255,0.9);
+    --joplin-odd-background-color: #eeeeee;
+    --joplin-color: #32373F;
+    --joplin-color-error: red;
+    --joplin-color-correct: green;
+    --joplin-color-warn: rgb(228,86,0);
+    --joplin-color-warn-url: #155BDA;
+    --joplin-color-faded: #7C8B9E;
+    --joplin-divider-color: #dddddd;
+    --joplin-selected-color: #e5e5e5;
+    --joplin-url-color: #155BDA;
+    --joplin-background-color2: #313640;
+    --joplin-color2: #ffffff;
+    --joplin-selected-color2: #131313;
+    --joplin-color-error2: #ff6c6c;
+    --joplin-color-warn2: #ffcb81;
+    --joplin-color-warn3: #ff7626;
+    --joplin-background-color3: #F4F5F6;
+    --joplin-background-color-hover3: #CBDAF1;
+    --joplin-color3: #738598;
+    --joplin-background-color4: #ffffff;
+    --joplin-color4: #2D6BDC;
+    --joplin-raised-background-color: #e5e5e5;
+    --joplin-raised-color: #222222;
+    --joplin-search-marker-background-color: #F7D26E;
+    --joplin-search-marker-color: black;
+    --joplin-warning-background-color: #FFD08D;
+    --joplin-table-background-color: rgb(247, 247, 247);
+    --joplin-code-background-color: rgb(243, 243, 243);
+    --joplin-code-border-color: rgb(220, 220, 220);
+    --joplin-code-color: rgb(0,0,0);
+    --joplin-block-quote-opacity: 0.7;
+    --joplin-zoom-ratio: 1px;
+    --joplin-selected-divider-color: #B1B1B1;
+    --joplin-color5: #ffffff;
+    --joplin-background-color5: #2D6BDC;
+    --joplin-background-color-hover5: #1E54B6;
+    --joplin-background-color-active5: #173F88;
+    --joplin-config-screen-padding: 24px;
+    --joplin-color-hover: #32373F;
+    --joplin-background-hover: #13131344;
+    --joplin-highlighted-color: #131313;
+    --joplin-cache-key: 1px;
+
+*/
+
+
 .container {
   background-color: var(--joplin-background-color);
-  color: red;
-  font-size: 42;
+  color: var(--joplin-color);
+  font-size: var(--joplin-font-family);
   font-family: var(--joplin-font-family);
 }
  
