@@ -3,6 +3,7 @@ import { useState, useEffect, useLayoutEffect, useRef } from 'react'
 import * as ReactDOM from 'react-dom/client'
 
 import { useAsync } from 'react-use'
+import classnames from 'classnames'
 
 import { ChannelClient, ChannelErrors, PostMessageTarget } from '../shared/channelRpc'
 
@@ -127,20 +128,24 @@ function App() {
   return (
     <div className={searchStyles.SearchFiles}>
       <h1 className="mb-2 text-lg font-bold">Joplin VS Code-style Search Plugin</h1>
-      <div className={searchStyles.InputWrapper}>
-        <input
-          type="text"
-          className={searchStyles.Input}
-          onChange={handleChange}
-          value={searchText}
-          placeholder="Enter text to search for"
-        />
+      <div className="border rounded-sm border-gray-200 m-1 p-1">
+        <div className={classnames(searchStyles.InputWrapper, 'mb-2')}>
+          <input
+            type="text"
+            className={classnames(searchStyles.Input, 'px-1')}
+            onChange={handleChange}
+            value={searchText}
+            placeholder="Enter text to search for"
+          />
+        </div>
+        <div className="mb-1 p-2">
+          <label>
+            <input type="checkbox" checked={titlesOnly} onChange={handleTitlesOnlyChanged} className="mr-1"></input>
+            Search in titles only{' '}
+          </label>
+        </div>
       </div>
-      <div className="mb-1">
-        <label>
-          <input type="checkbox" checked={titlesOnly} onChange={handleTitlesOnlyChanged}></input>Search in titles only{' '}
-        </label>
-      </div>
+
       <div className="grow">{rendered}</div>
     </div>
   )
