@@ -1,6 +1,5 @@
 import joplin from 'api'
 import type * as FSType from 'fs-extra'
-// import * as fs from 'node:fs'
 import { ChannelServer, PostMessageTarget } from './shared/channelRpc'
 import { RpcMethods } from './shared/rpcTypes'
 
@@ -57,18 +56,13 @@ async function searchNotes(queryOptions: SearchQueryOptions): Promise<Note[]> {
   const fields = ['id', 'title', 'body', 'parent_id', 'is_todo', 'todo_completed', 'todo_due', 'order', 'created_time']
 
   while (true) {
-    console.log('data call get', ['search'], {
-      query,
-      page,
-      fields,
-    })
     const res: SearchResponse = await joplin.data.get(['search'], {
       query,
       page,
       fields,
       limit: 100,
     })
-    console.log('Search response: ', { query, page })
+
     const { items: notes, has_more } = res
     allNotes = allNotes.concat(notes)
 
@@ -79,8 +73,6 @@ async function searchNotes(queryOptions: SearchQueryOptions): Promise<Note[]> {
       page++
     }
   }
-
-  console.log('Search query: ', queryOptions, 'Found notes: ', allNotes)
 
   return allNotes
 }
@@ -94,8 +86,6 @@ joplin.plugins.register({
     console.log('Plugin directory: ', pluginDir)
 
     const fs: typeof FSType = joplin.require('fs-extra')
-
-    const guiFolder = pluginDir + '/gui/'
 
     const files = await fs.promises.readdir(pluginDir + '/gui/')
     console.log('Plugin files: ', files)
@@ -112,8 +102,6 @@ joplin.plugins.register({
 		`,
     )
 
-    // await joplin.views.panels.addScript(panel, 'gui/index.css')
-    // await joplin.views.panels.addScript(panel, 'gui/app.css')
     for (const file of cssFiles) {
       await joplin.views.panels.addScript(panel, file)
     }
@@ -121,20 +109,16 @@ joplin.plugins.register({
 
     const target: PostMessageTarget = {
       postMessage: async (message: any) => {
-        // console.log('Server postMessage: ', message)
         joplin.views.panels.postMessage(panel, message)
       },
       onMessage(listener) {
-        // console.log('Server onMessage listener: ', listener)
         joplin.views.panels.onMessage(panel, (originalMessage) => {
-          // console.log('Server onMessage: ', originalMessage)
           listener({ source: target, data: originalMessage })
         })
       },
     }
 
     const server = createRpcServer(target)
-    // console.log('Starting server')
     server.start()
   },
 })
