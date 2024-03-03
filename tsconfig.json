@@ -3,9 +3,10 @@
 		"outDir": "./dist/",
 		"module": "commonjs",
 		"target": "es2020",
-		"jsx": "react",
+		"jsx": "react-jsx",
 		"allowJs": true,
 		"baseUrl": ".",
+    "esModuleInterop": true,
 		"types": ["node"]
 	}
 }
