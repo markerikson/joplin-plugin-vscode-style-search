@@ -1,0 +1,18 @@
+.Results,
+.ResultsPending {
+  height: 100%;
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  cursor: default;
+  user-select: none;
+  transition-duration: 200ms;
+}
+.ResultsPending {
+  opacity: 0.5;
+}
+
+.List {
+  overflow: hidden;
+  flex: 1 1 auto;
+}

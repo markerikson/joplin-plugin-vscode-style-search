@@ -1,8 +1,7 @@
 import * as React from 'react'
 import { useState, useEffect, useLayoutEffect, useRef } from 'react'
 import * as ReactDOM from 'react-dom/client'
-import { marked } from 'marked'
-import { convert as htmlToText } from 'html-to-text'
+
 import { useAsync } from 'react-use'
 
 import { ChannelClient, ChannelErrors, PostMessageTarget } from '../shared/channelRpc'
@@ -13,6 +12,9 @@ import './tailwind.css'
 import './variables.css'
 import searchStyles from './SearchFiles.module.css'
 import { keywords } from './searchProcessing'
+import { parseNote } from './noteParsings'
+import { NoteSearchItemData } from './NoteSearchListData'
+import ResultsList from './ResultsList'
 
 console.log('Search styles: ', searchStyles)
 
@@ -40,32 +42,6 @@ function parseColor(input: string) {
   else throw new Error('Colour ' + input + ' could not be parsed.')
 }
 
-export function nextWhitespaceIndex(s: string, begin: number) {
-  // returns index of the next whitespace character
-  const i = s.slice(begin).search(/\s/)
-  return i < 0 ? s.length : begin + i
-}
-
-const mergeOverlappingIntervals = function (intervals: any[], limit: number) {
-  intervals.sort((a, b) => a[0] - b[0])
-
-  const stack: any[] = []
-  if (intervals.length) {
-    stack.push(intervals[0])
-    for (let i = 1; i < intervals.length && stack.length < limit; i++) {
-      const top = stack[stack.length - 1]
-      if (top[1] < intervals[i][0]) {
-        stack.push(intervals[i])
-      } else if (top[1] < intervals[i][1]) {
-        top[1] = intervals[i][1]
-        stack.pop()
-        stack.push(top)
-      }
-    }
-  }
-  return stack
-}
-
 // Create a ChannelClient instance
 const client = new ChannelClient<HandlerType>({
   target,
@@ -77,15 +53,20 @@ function App() {
   const [searchText, setSearchText] = useState('')
   const [titlesOnly, setTitlesOnly] = useState(false)
 
+  const parsedKeywords = keywords(searchText)
+
   const { value: searchResults, loading } = useAsync(async () => {
-    let notes: Note[] = []
+    let noteListData: NoteSearchItemData[] = []
     console.log('Search value: ', searchText)
     if (searchText) {
-      notes = await client.stub.search({ searchText: searchText, titlesOnly })
+      const notes = await client.stub.search({ searchText: searchText, titlesOnly })
       console.log('Search notes: ', notes)
+
+      noteListData = notes.map((note) => parseNote(note, parsedKeywords)).flat()
+      console.log('Note list data: ', noteListData)
     }
 
-    return notes
+    return noteListData
   }, [searchText, titlesOnly])
 
   const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -138,10 +119,6 @@ function App() {
   //   fetchNotes()
   // }, [searchText, titlesOnly])
 
-  const parsedKeywords = keywords(searchText)
-
-  console.log('Keywords: ', parsedKeywords)
-
   let rendered: React.ReactNode = null
 
   if (!searchText) {
@@ -151,64 +128,30 @@ function App() {
   } else if (searchResults.length === 0) {
     rendered = 'No results found'
   } else {
-    const renderedNotes = searchResults.map((note) => {
-      const htmlContent = marked.parse(note.body) as string
-      const strippedContent = htmlToText(htmlContent)
+    // const renderedNotes = searchResults.map((note) => {
+    //   return (
+    //     <li key={note.id}>
+    //       {note.title}
+    //       <div>
+    //         <b>Content</b>: {strippedContent.slice(0, 100)}
+    //       </div>
+    //       <div>
+    //         <b>Fragments:</b> {fragments}
+    //       </div>
+    //     </li>
+    //   )
+    // })
 
-      const indices: number[][] = []
-
-      let fragments = ''
-
-      for (let keyword of parsedKeywords) {
-        let valueRegex: string | undefined = undefined
-        if (typeof keyword === 'string') {
-          valueRegex = keyword
-        } else if (keyword.type === 'text') {
-          valueRegex = keyword.value
-        } else if (keyword.valueRegex) {
-          valueRegex = keyword.valueRegex
-        }
-
-        if (valueRegex) {
-          for (const match of strippedContent.matchAll(new RegExp(valueRegex, 'ig'))) {
-            // Populate 'indices' with [begin index, end index] of each note fragment
-            // Begins at the regex matching index, ends at the next whitespace after seeking 15 characters to the right
-            indices.push([match.index, nextWhitespaceIndex(strippedContent, match.index + match[0].length + 15)])
-            if (indices.length > 20) break
-          }
-        } else {
-          fragments = 'N/A'
-        }
-        // if (typeof keyword !== 'string' && 'valueRegex' in keyword) {
-        //   const { valueRegex } = keyword
-
-        // } else {
-        //   fragments = 'N/A'
-        // }
-      }
-
-      console.log('Indices: ', note.title, indices)
-
-      const mergedIndices = mergeOverlappingIntervals(indices, 3)
-      fragments = mergedIndices.map((f: any) => strippedContent.slice(f[0], f[1])).join(' ... ')
-      // Add trailing ellipsis if the final fragment doesn't end where the note is ending
-      if (mergedIndices.length && mergedIndices[mergedIndices.length - 1][1] !== strippedContent.length)
-        fragments += ' ...'
-
-      return (
-        <li key={note.id}>
-          {note.title}
-          <div>
-            <b>Content</b>: {strippedContent.slice(0, 100)}
-          </div>
-          <div>
-            <b>Fragments:</b> {fragments}
-          </div>
-        </li>
-      )
-    })
-
-    rendered = <ul>{renderedNotes}</ul>
+    rendered = (
+      <ResultsList
+        query={searchText}
+        results={searchResults}
+        status="resolved"
+        openNote={(id) => {
+          console.log('Opening note: ', id)
+        }}
+      />
+    )
   }
 
   return (
@@ -222,7 +165,7 @@ function App() {
           <input type="checkbox" checked={titlesOnly} onChange={handleTitlesOnlyChanged}></input>Titles Only{' '}
         </label>
       </div>
-      <div>
+      <div style={{ flexGrow: 2 }}>
         Results:
         {rendered}
       </div>

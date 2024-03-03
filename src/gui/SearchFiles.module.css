@@ -3,6 +3,8 @@
   border-radius: 0.5rem;
   background-color: var(--body-bgcolor);
   padding: 0.5rem 0;
+  display: flex;
+  flex-direction: column;
 }
 
 .CheckboxWrapper {
