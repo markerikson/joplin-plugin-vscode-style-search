@@ -107,21 +107,23 @@ function App() {
     rendered = 'No results found'
   } else {
     rendered = (
-      <div className="h-full">
+      <>
         <h3 className="mb-2  font-bold">Results</h3>
         <div className="mb-1">
           {searchResults.noteListData.length} results in {searchResults.notes.length} notes
         </div>
-        <ResultsList
-          query={searchText}
-          results={searchResults.noteListData}
-          titlesOnly={titlesOnly}
-          status="resolved"
-          openNote={async (id, line?: number) => {
-            await client.stub.openNote(id, line)
-          }}
-        />
-      </div>
+        <div className="grow">
+          <ResultsList
+            query={searchText}
+            results={searchResults.noteListData}
+            titlesOnly={titlesOnly}
+            status="resolved"
+            openNote={async (id, line?: number) => {
+              await client.stub.openNote(id, line)
+            }}
+          />
+        </div>
+      </>
     )
   }
 
@@ -146,7 +148,7 @@ function App() {
         </div>
       </div>
 
-      <div className="grow">{rendered}</div>
+      {rendered}
     </div>
   )
 }

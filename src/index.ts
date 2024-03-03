@@ -1,4 +1,5 @@
 import joplin from 'api'
+import { MenuItemLocation, ToolbarButtonLocation } from 'api/types'
 import type * as FSType from 'fs-extra'
 import { ChannelServer, PostMessageTarget } from './shared/channelRpc'
 import { RpcMethods } from './shared/rpcTypes'
@@ -88,35 +89,55 @@ async function searchNotes(queryOptions: SearchQueryOptions): Promise<Note[]> {
   return allNotes
 }
 
+async function setUpSearchPanel(panel: string) {
+  const pluginDir = await joplin.plugins.installationDir()
+
+  const fs: typeof FSType = joplin.require('fs-extra')
+
+  const files = await fs.promises.readdir(pluginDir + '/gui/')
+
+  const cssFiles = files.filter((file) => file.endsWith('.css')).map((file) => 'gui/' + file)
+
+  await joplin.views.panels.setHtml(
+    panel,
+    `
+			<div id="root"></div>
+		`,
+  )
+
+  for (const file of cssFiles) {
+    await joplin.views.panels.addScript(panel, file)
+  }
+  await joplin.views.panels.addScript(panel, 'gui/index.js')
+}
+
 joplin.plugins.register({
   onStart: async function () {
-    // eslint-disable-next-line no-console
-    console.info('Hello world. Test plugin started! 42')
-
-    const pluginDir = await joplin.plugins.installationDir()
-    console.log('Plugin directory: ', pluginDir)
-
-    const fs: typeof FSType = joplin.require('fs-extra')
-
-    const files = await fs.promises.readdir(pluginDir + '/gui/')
-    console.log('Plugin files: ', files)
-    const cssFiles = files.filter((file) => file.endsWith('.css')).map((file) => 'gui/' + file)
-
     // Create the panel object
     const panel = await joplin.views.panels.create('panel_1')
 
-    // Set some initial content while the TOC is being created
-    await joplin.views.panels.setHtml(
-      panel,
-      `
-			<div id="root"></div>
-		`,
-    )
+    await joplin.views.panels.hide(panel)
 
-    for (const file of cssFiles) {
-      await joplin.views.panels.addScript(panel, file)
-    }
-    await joplin.views.panels.addScript(panel, 'gui/index.js')
+    setUpSearchPanel(panel)
+
+    joplin.commands.register({
+      name: 'isquaredsoftware.vscode-search.toggle_panel',
+      label: 'Toggle VS Code-style search panel',
+      execute: async () => {
+        if (await joplin.views.panels.visible(panel)) {
+          await joplin.views.panels.hide(panel)
+        } else {
+          await joplin.views.panels.show(panel)
+        }
+      },
+    })
+
+    joplin.views.menuItems.create(
+      'isquaredsoftware.vscode-search.toggle_panel.menuitem',
+      'isquaredsoftware.vscode-search.toggle_panel',
+      MenuItemLocation.View,
+      { accelerator: 'CmdOrCtrl+Shift+F' },
+    )
 
     const target: PostMessageTarget = {
       postMessage: async (message: any) => {
