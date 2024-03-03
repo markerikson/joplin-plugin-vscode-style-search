@@ -30,8 +30,7 @@ const target: PostMessageTarget = {
 function parseColor(input: string) {
   // const div = document.createElement('div')
   // div.style.color = input
-  // const actualColor = getComputedStyle(div).color
-  // console.log('Actual color: ', actualColor)
+  // const actualColor = getComputedStyle(div).color=
   const m = input.match(/^rgba?\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+),?\s*(\d+)?\)$/i)
   if (m) return [m[1], m[2], m[3]]
   else throw new Error('Colour ' + input + ' could not be parsed.')
@@ -52,13 +51,14 @@ function App() {
 
   const { value: searchResults, loading } = useAsync(async () => {
     let noteListData: NoteSearchItemData[] = []
+    let notes: Note[] = []
     if (searchText) {
-      const notes = await client.stub.search({ searchText: searchText, titlesOnly })
+      notes = await client.stub.search({ searchText: searchText, titlesOnly })
 
       noteListData = notes.map((note) => parseNote(note, parsedKeywords, titlesOnly)).flat()
     }
 
-    return noteListData
+    return { notes, noteListData }
   }, [searchText, titlesOnly])
 
   const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -78,6 +78,9 @@ function App() {
       return
     }
     initializedRef.current = true
+
+    // Horribly hacky attempt to figure out what the current theme is
+    // This will not scale, but I can't find an immediate way to query Joplin's theme settings
 
     const computedStyle = window.getComputedStyle(document.documentElement)
 
@@ -99,18 +102,25 @@ function App() {
     rendered = 'Enter a search term'
   } else if (loading) {
     rendered = 'Loading...'
-  } else if (searchResults.length === 0) {
+  } else if (searchResults.noteListData.length === 0) {
     rendered = 'No results found'
   } else {
     rendered = (
-      <ResultsList
-        query={searchText}
-        results={searchResults}
-        status="resolved"
-        openNote={async (id) => {
-          await client.stub.openNote(id)
-        }}
-      />
+      <div className="h-full">
+        <h3 className="mb-2  font-bold">Results</h3>
+        <div className="mb-1">
+          {searchResults.noteListData.length} results in {searchResults.notes.length} notes
+        </div>
+        <ResultsList
+          query={searchText}
+          results={searchResults.noteListData}
+          titlesOnly={titlesOnly}
+          status="resolved"
+          openNote={async (id) => {
+            await client.stub.openNote(id)
+          }}
+        />
+      </div>
     )
   }
 
@@ -118,17 +128,20 @@ function App() {
     <div className={searchStyles.SearchFiles}>
       <h1 className="mb-2 text-lg font-bold">Joplin VS Code-style Search Plugin</h1>
       <div className={searchStyles.InputWrapper}>
-        <input type="text" className={searchStyles.Input} onChange={handleChange} value={searchText} />
+        <input
+          type="text"
+          className={searchStyles.Input}
+          onChange={handleChange}
+          value={searchText}
+          placeholder="Enter text to search for"
+        />
       </div>
-      <div>
+      <div className="mb-1">
         <label>
-          <input type="checkbox" checked={titlesOnly} onChange={handleTitlesOnlyChanged}></input>Titles Only{' '}
+          <input type="checkbox" checked={titlesOnly} onChange={handleTitlesOnlyChanged}></input>Search in titles only{' '}
         </label>
       </div>
-      <div style={{ flexGrow: 2 }}>
-        Results:
-        {rendered}
-      </div>
+      <div className="grow">{rendered}</div>
     </div>
   )
 }

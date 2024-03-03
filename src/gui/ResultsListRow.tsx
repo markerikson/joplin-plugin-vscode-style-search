@@ -1,4 +1,4 @@
-import { CSSProperties, useContext, useMemo } from 'react'
+import React, { CSSProperties, useContext, useMemo } from 'react'
 
 import Expandable from './Expandable'
 import Icon from './Icon'
@@ -20,6 +20,7 @@ export const ITEM_SIZE = 20
 export type ItemData = {
   listData: NoteSearchListData
   query: string
+  titlesOnly: boolean
   openNote: (noteId: string) => void
 }
 
@@ -35,7 +36,7 @@ export default function ResultsListItem({
   const { itemData, listData: genericListData } = data
 
   const listData = genericListData as NoteSearchListData
-  const { openNote } = itemData
+  const { openNote, titlesOnly } = itemData
   const { isCollapsed, result } = listData.getItemAtIndex(index)
 
   if (isNoteItem(result)) {
@@ -44,6 +45,7 @@ export default function ResultsListItem({
         index={index}
         isCollapsed={isCollapsed}
         listData={listData}
+        titlesOnly={titlesOnly}
         result={result}
         style={style}
         openNote={openNote}
@@ -60,6 +62,7 @@ function LocationRow({
   index,
   isCollapsed,
   listData,
+  titlesOnly,
   result,
   style,
   openNote,
@@ -67,43 +70,55 @@ function LocationRow({
   index: number
   isCollapsed: boolean
   listData: NoteSearchListData
+  titlesOnly: boolean
   result: NoteItemData
   style: CSSProperties
   openNote: (noteId: string) => void
 }) {
   const { id, title, matchCount } = result
 
-  return (
-    <div style={style}>
+  const handleOpenNoteClicked = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    openNote(result.id)
+  }
+
+  const noteHeaderContent = (
+    <>
+      <Icon className={styles.LocationIcon} type="file" />
+      <div className={styles.Location} title={title}>
+        {title}
+      </div>
+      {titlesOnly ? null : (
+        <div className={styles.Count}>({matchCount === 1 ? '1 match' : `${matchCount} matches`})</div>
+      )}
+
+      <Icon className={styles.LocationIcon} type="open" title="Open Note" onClick={handleOpenNoteClicked} />
+    </>
+  )
+
+  let rowContent = (
+    <span className="inline-block">
+      <span className={styles.LocationRow} onClick={handleOpenNoteClicked}>
+        {noteHeaderContent}
+      </span>
+    </span>
+  )
+
+  if (!titlesOnly) {
+    rowContent = (
       <Expandable
         children={null}
-        defaultOpen={!isCollapsed}
-        header={
-          <>
-            <Icon className={styles.LocationIcon} type="file" />
-            <div className={styles.Location} title={title}>
-              {title}
-            </div>
-            <div className={styles.Count}>({matchCount === 1 ? '1 match' : `${matchCount} matches`})</div>
-
-            <Icon
-              className={styles.LocationIcon}
-              type="open"
-              title="Open Note"
-              onClick={(e) => {
-                e.preventDefault()
-                e.stopPropagation()
-                openNote(result.id)
-              }}
-            />
-          </>
-        }
+        defaultOpen={titlesOnly ? false : !isCollapsed}
+        header={noteHeaderContent}
         headerClassName={styles.LocationRow}
         key={id /* Re-apply defaultCollapsed if row content changes */}
         onChange={(collapsed) => listData.toggleCollapsed(index, !collapsed)}
       />
-    </div>
-  )
+    )
+  }
+
+  return <div style={style}>{rowContent}</div>
 }
 
 interface MatchRowProps {

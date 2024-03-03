@@ -12,10 +12,11 @@ interface ResultsListProps {
   query: string
   status: 'pending' | 'resolved'
   results: NoteSearchItemData[]
+  titlesOnly: boolean
   openNote: (noteId: string) => void
 }
 
-export default function ResultsList({ query, status, results, openNote }: ResultsListProps) {
+export default function ResultsList({ query, status, results, titlesOnly, openNote }: ResultsListProps) {
   const isPending = status === STATUS_PENDING
 
   const listData = useMemo(() => new NoteSearchListData(results), [results])
@@ -29,6 +30,7 @@ export default function ResultsList({ query, status, results, openNote }: Result
       listData,
       query,
       results,
+      titlesOnly,
       openNote,
     }),
     [listData, query, results, openNote],
