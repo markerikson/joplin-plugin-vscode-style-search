@@ -57,13 +57,10 @@ function App() {
 
   const { value: searchResults, loading } = useAsync(async () => {
     let noteListData: NoteSearchItemData[] = []
-    console.log('Search value: ', searchText)
     if (searchText) {
       const notes = await client.stub.search({ searchText: searchText, titlesOnly })
-      console.log('Search notes: ', notes)
 
-      noteListData = notes.map((note) => parseNote(note, parsedKeywords)).flat()
-      console.log('Note list data: ', noteListData)
+      noteListData = notes.map((note) => parseNote(note, parsedKeywords, titlesOnly)).flat()
     }
 
     return noteListData
@@ -147,8 +144,8 @@ function App() {
         query={searchText}
         results={searchResults}
         status="resolved"
-        openNote={(id) => {
-          console.log('Opening note: ', id)
+        openNote={async (id) => {
+          await client.stub.openNote(id)
         }}
       />
     )

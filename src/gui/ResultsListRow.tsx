@@ -58,7 +58,16 @@ export default function ResultsListItem({
   console.log('Note item: ', index, result)
 
   if (isNoteItem(result)) {
-    return <LocationRow index={index} isCollapsed={isCollapsed} listData={listData} result={result} style={style} />
+    return (
+      <LocationRow
+        index={index}
+        isCollapsed={isCollapsed}
+        listData={listData}
+        result={result}
+        style={style}
+        openNote={openNote}
+      />
+    )
   } else if (isFragmentItem(result)) {
     return <MatchRow query={itemData.query} result={result} style={style} openNote={openNote} />
   } else {
@@ -72,12 +81,14 @@ function LocationRow({
   listData,
   result,
   style,
+  openNote,
 }: {
   index: number
   isCollapsed: boolean
   listData: NoteSearchListData
   result: NoteItemData
   style: CSSProperties
+  openNote: (noteId: string) => void
 }) {
   const { id, title, matchCount } = result
 
@@ -109,6 +120,17 @@ function LocationRow({
               {title}
             </div>
             <div className={styles.Count}>({matchCount === 1 ? '1 match' : `${matchCount} matches`})</div>
+
+            <Icon
+              className={styles.LocationIcon}
+              type="open"
+              title="Open Note"
+              onClick={(e) => {
+                e.preventDefault()
+                e.stopPropagation()
+                openNote(result.id)
+              }}
+            />
           </>
         }
         headerClassName={styles.LocationRow}

@@ -10,8 +10,10 @@ export interface SearchQueryOptions {
 }
 
 const handler = {
-  add: (a: number, b: number): number => a + b,
   search: searchNotes,
+  openNote: async (noteId: string) => {
+    await joplin.commands.execute('openNote', noteId)
+  },
 }
 
 export type HandlerType = typeof handler
