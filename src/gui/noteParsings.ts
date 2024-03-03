@@ -28,24 +28,10 @@ export function nextWhitespaceIndex(s: string, begin: number) {
   return i < 0 ? s.length : begin + i
 }
 
-const mergeOverlappingIntervals = function (intervals: any[], limit: number) {
-  intervals.sort((a, b) => a[0] - b[0])
-
-  const stack: number[][] = []
-  if (intervals.length) {
-    stack.push(intervals[0])
-    for (let i = 1; i < intervals.length && stack.length < limit; i++) {
-      const top = stack[stack.length - 1]
-      if (top[1] < intervals[i][0]) {
-        stack.push(intervals[i])
-      } else if (top[1] < intervals[i][1]) {
-        top[1] = intervals[i][1]
-        stack.pop()
-        stack.push(top)
-      }
-    }
-  }
-  return stack
+export function previousWhitespaceIndex(s: string, begin: number) {
+  // returns index of the previous whitespace character
+  const i = s.slice(0, begin).search(/\s$/)
+  return i < 0 ? 0 : i
 }
 
 export const parseNote = (
@@ -54,11 +40,9 @@ export const parseNote = (
   titlesOnly: boolean,
 ): NoteSearchItemData[] => {
   const results: NoteSearchItemData[] = []
-  const indices: number[][] = []
+  const fragments: string[] = []
 
   const strippedContent = getParsedNoteBody(note.body)
-
-  // let fragments = ''
 
   if (!titlesOnly) {
     for (let keyword of parsedKeywords) {
@@ -72,27 +56,22 @@ export const parseNote = (
       }
 
       if (valueRegex) {
-        for (const match of strippedContent.matchAll(new RegExp(valueRegex, 'ig'))) {
-          // Populate 'indices' with [begin index, end index] of each note fragment
-          // Begins at the regex matching index, ends at the next whitespace after seeking 15 characters to the right
-          indices.push([match.index, nextWhitespaceIndex(strippedContent, match.index + match[0].length + 15)])
-          // if (indices.length > 20) break
-        }
-      } else {
-        // fragments = 'N/A'
-      }
-      // if (typeof keyword !== 'string' && 'valueRegex' in keyword) {
-      //   const { valueRegex } = keyword
+        const fullLineRegexpString = `\r?\n(?<line>(?<linePrefix>.*)(?<searchMatch>${valueRegex}).*)\r?\n?`
 
-      // } else {
-      //   fragments = 'N/A'
-      // }
+        for (const match of strippedContent.matchAll(new RegExp(fullLineRegexpString, 'ig'))) {
+          const { groups = {} } = match
+          const { line, searchMatch, linePrefix } = groups
+
+          if (line && searchMatch && linePrefix) {
+            // Arbitrarily do 15 characters on either side, expanded to word boundaries.
+            const fragmentStart = previousWhitespaceIndex(line, linePrefix.length - 15)
+            const fragmentEnd = nextWhitespaceIndex(line, linePrefix.length + searchMatch.length + 15)
+            fragments.push(line.slice(fragmentStart, fragmentEnd))
+          }
+        }
+      }
     }
   }
-
-  const mergedIndices = mergeOverlappingIntervals(indices, 3)
-  const fragments = mergedIndices.map((f: any) => strippedContent.slice(f[0], f[1]))
-  // Add trailing ellipsis if the final fragment doesn't end where the note is ending
 
   if (titlesOnly || fragments.length) {
     results.push({
