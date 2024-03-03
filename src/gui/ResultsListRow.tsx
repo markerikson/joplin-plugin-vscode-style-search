@@ -1,34 +1,17 @@
 import { CSSProperties, useContext, useMemo } from 'react'
-// import { useImperativeIntervalCacheValues } from "suspense";
 
 import Expandable from './Expandable'
 import Icon from './Icon'
 import {
   NoteSearchListData,
   Item,
-  NoteSearchResult,
   isNoteItem,
   isFragmentItem,
-  NoteSearchItemData,
   NoteItemData,
   FragmentItemData,
 } from './NoteSearchListData'
 import HighlightMatch from './HighlightMatch'
 import { GenericListItemData } from './GenericList'
-// import { FocusContext } from "replay-next/src/contexts/FocusContext";
-// import { SourcesContext } from "replay-next/src/contexts/SourcesContext";
-// import {
-//   SourceSearchResultLocation,
-//   SourceSearchResultMatch,
-//   isSourceSearchResultLocation,
-//   isSourceSearchResultMatch,
-// } from "replay-next/src/suspense/SearchCache";
-// import { sourceHitCountsCache } from "replay-next/src/suspense/SourceHitCountsCache";
-// import { Source } from "replay-next/src/suspense/SourcesCache";
-// import { getSourceFileName } from "replay-next/src/utils/source";
-// import { getRelativePathWithoutFile } from "replay-next/src/utils/url";
-// import { ReplayClientContext } from "shared/client/ReplayClientContext";
-// import { toPointRange } from "shared/utils/time";
 
 import styles from './ResultsListRow.module.css'
 
@@ -54,8 +37,6 @@ export default function ResultsListItem({
   const listData = genericListData as NoteSearchListData
   const { openNote } = itemData
   const { isCollapsed, result } = listData.getItemAtIndex(index)
-
-  console.log('Note item: ', index, result)
 
   if (isNoteItem(result)) {
     return (
@@ -91,22 +72,6 @@ function LocationRow({
   openNote: (noteId: string) => void
 }) {
   const { id, title, matchCount } = result
-
-  console.log('LocationRow: ', index, id, title, matchCount)
-
-  // const [fileName, path] = useMemo(() => {
-  //   const source = sources.find(({ sourceId }) => sourceId === location.sourceId)
-  //   if (source == null) {
-  //     return ['(unknown)', '']
-  //   }
-
-  //   const fileName = getSourceFileName(source)
-  //   const path = source.url ? getRelativePathWithoutFile(source.url) : ''
-
-  //   return [fileName, path]
-  // }, [location, sources])
-
-  // const locationString = `${fileName} ${path ? `(${path})` : ''}`
 
   return (
     <div style={style}>
@@ -149,17 +114,10 @@ interface MatchRowProps {
 }
 
 function MatchRow({ query, result, style, openNote }: MatchRowProps) {
-  // const { context, location } = result.match
-
-  console.log('MatchRow: ', result.noteId, result.fragment)
-
   return (
     <div
       className={styles.MatchRow}
-      data-test-name="SearchFiles-ResultRow"
-      data-test-type="Match"
       onClick={() => {
-        // const lineIndex = location.line - 1
         openNote(result.noteId)
       }}
       style={style}

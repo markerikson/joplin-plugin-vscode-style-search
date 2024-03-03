@@ -16,17 +16,12 @@ import { parseNote } from './noteParsings'
 import { NoteSearchItemData } from './NoteSearchListData'
 import ResultsList from './ResultsList'
 
-console.log('Search styles: ', searchStyles)
-
 const target: PostMessageTarget = {
   postMessage: async (message: any) => {
-    // console.log('Client postMessage: ', message)
     webviewApi.postMessage(message)
   },
   onMessage(listener) {
-    // console.log('Client onMessage listener: ', listener)
     webviewApi.onMessage((originalMessage) => {
-      // console.log('Client onMessage: ', originalMessage)
       listener({ source: target, data: originalMessage.message })
     })
   },
@@ -86,14 +81,10 @@ function App() {
 
     const computedStyle = window.getComputedStyle(document.documentElement)
 
-    console.log('Computed style: ', computedStyle)
-
     const backgroundColor = computedStyle.getPropertyValue('background-color')
 
-    console.log('Background color: ', backgroundColor)
     const parsedColor = parseColor(backgroundColor)
 
-    console.log('Parsed color: ', parsedColor)
     let themeColor = 'theme-dark'
     if (parsedColor[0] === '0' && parsedColor[1] === '0' && parsedColor[2] === '0') {
       themeColor = 'theme-light'
@@ -101,20 +92,6 @@ function App() {
 
     document.documentElement.classList.add(themeColor)
   }, [])
-
-  // useEffect(() => {
-  //   const fetchNotes = async () => {
-  //     let notes: Note[] = []
-  //     console.log('Search value: ', searchText)
-  //     if (searchText) {
-  //       notes = await client.stub.search({ searchText: searchText, titlesOnly })
-  //       console.log('Search notes: ', notes)
-  //     }
-
-  //     setSearchResults(notes)
-  //   }
-  //   fetchNotes()
-  // }, [searchText, titlesOnly])
 
   let rendered: React.ReactNode = null
 
@@ -125,20 +102,6 @@ function App() {
   } else if (searchResults.length === 0) {
     rendered = 'No results found'
   } else {
-    // const renderedNotes = searchResults.map((note) => {
-    //   return (
-    //     <li key={note.id}>
-    //       {note.title}
-    //       <div>
-    //         <b>Content</b>: {strippedContent.slice(0, 100)}
-    //       </div>
-    //       <div>
-    //         <b>Fragments:</b> {fragments}
-    //       </div>
-    //     </li>
-    //   )
-    // })
-
     rendered = (
       <ResultsList
         query={searchText}
