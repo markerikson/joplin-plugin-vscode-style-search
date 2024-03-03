@@ -24,6 +24,7 @@
     "@types/node": "^20.11.20",
     "@types/react": "^18.2.55",
     "@types/react-dom": "^18.2.19",
+    "@types/react-window": "^1",
     "autoprefixer": "^10.4.17",
     "chalk": "^4.1.0",
     "copy-webpack-plugin": "^11.0.0",
@@ -46,6 +47,8 @@
     "marked": "^12.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-use": "^17.5.0"
+    "react-use": "^17.5.0",
+    "react-virtualized-auto-sizer": "^1.0.23",
+    "react-window": "^1.8.10"
   }
 }
