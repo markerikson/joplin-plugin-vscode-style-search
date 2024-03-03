@@ -5946,6 +5946,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"index-to-position@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "index-to-position@npm:1.0.0"
+  checksum: 10c0/7d723b62496d51691ac7c0607f05a8590d1d3193546ea86a0d4658e3e7d97573d900343ed805c1bfafe1e966ef902d70b971dd7e8d385370337f6f5be52068b5
+  languageName: node
+  linkType: hard
+
 "infer-owner@npm:^1.0.4":
   version: 1.0.4
   resolution: "infer-owner@npm:1.0.4"
@@ -6405,6 +6412,7 @@ __metadata:
     fs-extra: "npm:^10.1.0"
     glob: "npm:^8.0.3"
     html-to-text: "npm:^9.0.5"
+    index-to-position: "npm:^1.0.0"
     marked: "npm:^12.0.0"
     postcss: "npm:^8.4.35"
     postcss-loader: "npm:^8.1.0"
