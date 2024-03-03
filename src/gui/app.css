@@ -72,6 +72,10 @@ root {
 
 */
 
+html, body, body > div, div#root, div#joplin-plugin-content {
+  height: 100%;
+}
+
 
 .container {
   background-color: var(--joplin-background-color);
