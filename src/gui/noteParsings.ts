@@ -3,6 +3,7 @@ import { convert as htmlToText } from 'html-to-text'
 import { NoteSearchItemData } from './NoteSearchListData'
 import { ComplexTerm } from './searchProcessing'
 import { Note } from 'src'
+import indexToPosition from 'index-to-position'
 
 export const parsedNoteBodies = new Map<string, string>()
 
@@ -40,7 +41,7 @@ export const parseNote = (
   titlesOnly: boolean,
 ): NoteSearchItemData[] => {
   const results: NoteSearchItemData[] = []
-  const fragments: string[] = []
+  const fragmentMatches: { fragment: string; line: number }[] = []
 
   const strippedContent = getParsedNoteBody(note.body)
 
@@ -66,29 +67,33 @@ export const parseNote = (
             // Arbitrarily do 15 characters on either side, expanded to word boundaries.
             const fragmentStart = previousWhitespaceIndex(line, linePrefix.length - 15)
             const fragmentEnd = nextWhitespaceIndex(line, linePrefix.length + searchMatch.length + 15)
-            fragments.push(line.slice(fragmentStart, fragmentEnd))
+            fragmentMatches.push({
+              fragment: line.slice(fragmentStart, fragmentEnd),
+              line: indexToPosition(strippedContent, match.index).line,
+            })
           }
         }
       }
     }
   }
 
-  if (titlesOnly || fragments.length) {
+  if (titlesOnly || fragmentMatches.length) {
     results.push({
       type: 'note',
       id: note.id,
       note,
       title: note.title,
-      matchCount: fragments.length,
+      matchCount: fragmentMatches.length,
     })
   }
 
-  for (const [index, fragment] of fragments.entries()) {
+  for (const [index, match] of fragmentMatches.entries()) {
     results.push({
       type: 'fragment',
       id: `${note.id}-${index}`,
       noteId: note.id,
-      fragment,
+      fragment: match.fragment,
+      line: match.line,
     })
   }
 

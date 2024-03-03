@@ -117,8 +117,8 @@ function App() {
           results={searchResults.noteListData}
           titlesOnly={titlesOnly}
           status="resolved"
-          openNote={async (id) => {
-            await client.stub.openNote(id)
+          openNote={async (id, line?: number) => {
+            await client.stub.openNote(id, line)
           }}
         />
       </div>

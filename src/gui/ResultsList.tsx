@@ -13,7 +13,7 @@ interface ResultsListProps {
   status: 'pending' | 'resolved'
   results: NoteSearchItemData[]
   titlesOnly: boolean
-  openNote: (noteId: string) => void
+  openNote: (noteId: string, line?: number) => void
 }
 
 export default function ResultsList({ query, status, results, titlesOnly, openNote }: ResultsListProps) {

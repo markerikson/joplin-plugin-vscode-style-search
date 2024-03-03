@@ -21,7 +21,7 @@ export type ItemData = {
   listData: NoteSearchListData
   query: string
   titlesOnly: boolean
-  openNote: (noteId: string) => void
+  openNote: (noteId: string, line?: number) => void
 }
 
 export default function ResultsListItem({
@@ -73,7 +73,7 @@ function LocationRow({
   titlesOnly: boolean
   result: NoteItemData
   style: CSSProperties
-  openNote: (noteId: string) => void
+  openNote: (noteId: string, line?: number) => void
 }) {
   const { id, title, matchCount } = result
 
@@ -125,7 +125,7 @@ interface MatchRowProps {
   query: string
   result: FragmentItemData
   style: CSSProperties
-  openNote: (noteId: string) => void
+  openNote: (noteId: string, line?: number) => void
 }
 
 function MatchRow({ query, result, style, openNote }: MatchRowProps) {
@@ -133,7 +133,7 @@ function MatchRow({ query, result, style, openNote }: MatchRowProps) {
     <div
       className={styles.MatchRow}
       onClick={() => {
-        openNote(result.noteId)
+        openNote(result.noteId, result.line)
       }}
       style={style}
     >

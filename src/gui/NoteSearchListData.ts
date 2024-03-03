@@ -24,6 +24,7 @@ export type FragmentItemData = {
   id: string
   noteId: string
   fragment: string
+  line: number
 }
 
 export type NoteSearchItemData = NoteItemData | FragmentItemData

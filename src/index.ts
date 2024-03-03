@@ -10,8 +10,19 @@ export interface SearchQueryOptions {
 
 const handler = {
   search: searchNotes,
-  openNote: async (noteId: string) => {
+  openNote: async (noteId: string, line?: number) => {
     await joplin.commands.execute('openNote', noteId)
+
+    // TODO Figure out how to scroll to a specific line
+    // const delay_scroll = 1
+
+    // if (line > 0) {
+    //   await new Promise((res) => setTimeout(res, delay_scroll * 1000))
+    //   await joplin.commands.execute('editor.execCommand', {
+    //     name: 'sidebar_cm_scrollToLine',
+    //     args: [line - 1],
+    //   })
+    // }
   },
 }
 
