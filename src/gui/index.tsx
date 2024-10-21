@@ -127,7 +127,20 @@ function App() {
   } else {
     rendered = (
       <>
-        <h3 className="mb-2  font-bold">Results</h3>
+        <div className="flex justify-between">
+          <h3 className="mb-2  font-bold">Results</h3>
+          <div className="flex">
+            {' '}
+            <FilterButton
+              active={false}
+              toggle={() => listData.setAllCollapsed()}
+              icon="collapse"
+              tooltip="Collapse All"
+            />
+            <FilterButton active={false} toggle={() => listData.resultsUpdated()} icon="expand" tooltip="expand All" />
+          </div>
+        </div>
+
         <div className="mb-1">
           {searchResults.noteListData.length} results in {searchResults.notes.length} notes
         </div>
@@ -169,12 +182,6 @@ function App() {
             <input type="checkbox" checked={titlesOnly} onChange={handleTitlesOnlyChanged} className="mr-1"></input>
             Search in titles only{' '}
           </label>
-          <button disabled={!isSuccess} onClick={() => listData.setAllCollapsed()}>
-            Collapse All
-          </button>
-          <button disabled={!isSuccess} onClick={() => listData.resultsUpdated()}>
-            Expand All
-          </button>
         </div>
       </div>
 
