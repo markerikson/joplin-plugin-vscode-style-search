@@ -113,7 +113,7 @@ function LocationRow({
         header={noteHeaderContent}
         headerClassName={styles.LocationRow}
         key={id /* Re-apply defaultCollapsed if row content changes */}
-        onChange={(collapsed) => listData.toggleCollapsed(index, !collapsed)}
+        onChange={(collapsed) => listData.setCollapsed(index, !collapsed)}
       />
     )
   }

@@ -59,7 +59,7 @@ export class NoteSearchListData extends GenericListData<Item> {
     this.invalidate()
   }
 
-  toggleCollapsed(index: number, collapsed: boolean) {
+  setCollapsed(index: number, collapsed: boolean) {
     const { result } = this.getItemAtIndexImplementation(index)
 
     const resultIndex = this.orderedResults.indexOf(result)
