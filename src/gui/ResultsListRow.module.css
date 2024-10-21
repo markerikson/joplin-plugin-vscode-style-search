@@ -11,9 +11,10 @@
 .LocationRow {
   display: flex;
   align-items: center;
-  gap: 1ch;
+  /* gap: 1ch; */
   white-space: pre;
-  padding: 0 0.5rem;
+  /* padding: 0 0.5rem; */
+  padding-right: 0.2rem;
 }
 .MatchRow {
   white-space: pre;
