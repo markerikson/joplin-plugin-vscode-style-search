@@ -54,9 +54,13 @@ export class NoteSearchListData extends GenericListData<Item> {
   }
 
   resultsUpdated() {
+    this.clearCollapsed()
+    this.invalidate()
+  }
+
+  clearCollapsed() {
     this.collapsedResultIndexToCountMap.clear()
     this.collapsedRowCount = 0
-    this.invalidate()
   }
 
   setCollapsed(index: number, collapsed: boolean) {
@@ -79,6 +83,24 @@ export class NoteSearchListData extends GenericListData<Item> {
     }
 
     this.invalidate()
+  }
+
+  setAllCollapsed() {
+    this.clearCollapsed()
+    for (const [resultIndex, result] of this.orderedResults.entries()) {
+      if (!isNoteItem(result)) {
+        continue
+      }
+
+      this.collapsedResultIndexToCountMap.set(resultIndex, result.matchCount)
+      this.collapsedRowCount += result.matchCount
+    }
+
+    this.invalidate()
+  }
+
+  getAnyCollapsed() {
+    return this.collapsedResultIndexToCountMap.size > 0
   }
 
   protected getItemAtIndexImplementation(index: number): Item {

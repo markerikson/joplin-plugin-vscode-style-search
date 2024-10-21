@@ -52,7 +52,11 @@ function App() {
 
   const parsedKeywords = keywords(searchText)
 
-  const { value: searchResults, loading } = useAsync(async () => {
+  const {
+    value: searchResults,
+    loading,
+    error,
+  } = useAsync(async () => {
     let noteListData: NoteSearchItemData[] = []
     let notes: Note[] = []
     if (searchText) {
@@ -143,6 +147,9 @@ function App() {
     )
   }
 
+  const anyCollapsed = listData.getAnyCollapsed()
+  const isSuccess = !!searchText && !loading
+
   return (
     <div className={searchStyles.SearchFiles}>
       <h1 className="mb-2 text-lg font-bold">Joplin VS Code-style Search Plugin</h1>
@@ -162,7 +169,12 @@ function App() {
             <input type="checkbox" checked={titlesOnly} onChange={handleTitlesOnlyChanged} className="mr-1"></input>
             Search in titles only{' '}
           </label>
-          <button></button>
+          <button disabled={!isSuccess} onClick={() => listData.setAllCollapsed()}>
+            Collapse All
+          </button>
+          <button disabled={!isSuccess} onClick={() => listData.resultsUpdated()}>
+            Expand All
+          </button>
         </div>
       </div>
 
