@@ -57,7 +57,7 @@ export const parseNote = (
       }
 
       if (valueRegex) {
-        const fullLineRegexpString = `\r?\n(?<line>(?<linePrefix>.*)(?<searchMatch>${valueRegex}).*)\r?\n?`
+        const fullLineRegexpString = `(\r?\n)*(?<line>(?<linePrefix>.*)(?<searchMatch>${valueRegex}).*)\r?\n?`
 
         for (const match of strippedContent.matchAll(new RegExp(fullLineRegexpString, 'ig'))) {
           const { groups = {} } = match
