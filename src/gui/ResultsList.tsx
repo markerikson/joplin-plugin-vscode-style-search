@@ -7,17 +7,27 @@ import { GenericList } from './GenericList'
 import type { ItemData } from './ResultsListRow'
 import ResultsListRow, { ITEM_SIZE } from './ResultsListRow'
 import styles from './ResultsList.module.css'
+import { Folder } from 'src'
 
 interface ResultsListProps {
   query: string
   status: 'pending' | 'resolved'
   results: NoteSearchItemData[]
+  folders: Folder[]
   listData: NoteSearchListData
   titlesOnly: boolean
   openNote: (noteId: string, line?: number) => void
 }
 
-export default function ResultsList({ query, status, results, listData, titlesOnly, openNote }: ResultsListProps) {
+export default function ResultsList({
+  query,
+  status,
+  results,
+  listData,
+  folders,
+  titlesOnly,
+  openNote,
+}: ResultsListProps) {
   const isPending = status === STATUS_PENDING
 
   const itemData = useMemo<ItemData>(
@@ -25,10 +35,11 @@ export default function ResultsList({ query, status, results, listData, titlesOn
       listData,
       query,
       results,
+      folders,
       titlesOnly,
       openNote,
     }),
-    [listData, query, results, openNote],
+    [listData, query, results, folders, openNote],
   )
 
   if (status === STATUS_RESOLVED && results.length === 0) {

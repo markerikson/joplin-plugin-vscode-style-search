@@ -7,7 +7,7 @@ import classnames from 'classnames'
 
 import { ChannelClient, ChannelErrors, PostMessageTarget } from '../shared/channelRpc'
 
-import type { HandlerType, Note } from '../index'
+import type { Folder, HandlerType, Note } from '../index'
 
 import './tailwind.css'
 import './variables.css'
@@ -16,6 +16,7 @@ import { keywords } from './searchProcessing'
 import { parseNote } from './noteParsings'
 import { NoteSearchItemData, NoteSearchListData } from './NoteSearchListData'
 import ResultsList from './ResultsList'
+import { FilterButton } from './FilterButton'
 
 const target: PostMessageTarget = {
   postMessage: async (message: any) => {
@@ -50,22 +51,24 @@ function App() {
   const [searchText, setSearchText] = useState('')
   const [titlesOnly, setTitlesOnly] = useState(false)
 
-  const parsedKeywords = keywords(searchText)
-
   const {
     value: searchResults,
     loading,
     error,
   } = useAsync(async () => {
+    const parsedKeywords = keywords(searchText)
     let noteListData: NoteSearchItemData[] = []
     let notes: Note[] = []
+    let folders: Folder[] = []
     if (searchText) {
-      notes = await client.stub.search({ searchText: searchText, titlesOnly })
+      const searchResult = await client.stub.search({ searchText: searchText, titlesOnly })
+      notes = searchResult.notes
+      folders = searchResult.folders
 
       noteListData = notes.map((note) => parseNote(note, parsedKeywords, titlesOnly)).flat()
     }
 
-    return { notes, noteListData }
+    return { notes, noteListData, folders }
   }, [searchText, titlesOnly])
 
   const results = searchResults?.noteListData ?? NO_RESULTS
@@ -148,6 +151,7 @@ function App() {
           <ResultsList
             query={searchText}
             results={results}
+            folders={searchResults.folders}
             listData={listData}
             titlesOnly={titlesOnly}
             status="resolved"
