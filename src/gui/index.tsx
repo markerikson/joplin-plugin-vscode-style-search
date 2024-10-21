@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useState, useEffect, useLayoutEffect, useRef } from 'react'
+import { useState, useEffect, useLayoutEffect, useRef, useMemo } from 'react'
 import * as ReactDOM from 'react-dom/client'
 
 import { useAsync } from 'react-use'
@@ -14,7 +14,7 @@ import './variables.css'
 import searchStyles from './SearchFiles.module.css'
 import { keywords } from './searchProcessing'
 import { parseNote } from './noteParsings'
-import { NoteSearchItemData } from './NoteSearchListData'
+import { NoteSearchItemData, NoteSearchListData } from './NoteSearchListData'
 import ResultsList from './ResultsList'
 
 const target: PostMessageTarget = {
@@ -44,6 +44,8 @@ const client = new ChannelClient<HandlerType>({
   timeout: 10000,
 })
 
+const NO_RESULTS: NoteSearchItemData[] = []
+
 function App() {
   const [searchText, setSearchText] = useState('')
   const [titlesOnly, setTitlesOnly] = useState(false)
@@ -61,6 +63,14 @@ function App() {
 
     return { notes, noteListData }
   }, [searchText, titlesOnly])
+
+  const results = searchResults?.noteListData ?? NO_RESULTS
+
+  const listData = useMemo(() => new NoteSearchListData(results), [results])
+
+  useEffect(() => {
+    listData.resultsUpdated()
+  }, [listData, results, results.length])
 
   const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target
@@ -120,7 +130,8 @@ function App() {
         <div className="grow">
           <ResultsList
             query={searchText}
-            results={searchResults.noteListData}
+            results={results}
+            listData={listData}
             titlesOnly={titlesOnly}
             status="resolved"
             openNote={async (id, line?: number) => {
@@ -151,6 +162,7 @@ function App() {
             <input type="checkbox" checked={titlesOnly} onChange={handleTitlesOnlyChanged} className="mr-1"></input>
             Search in titles only{' '}
           </label>
+          <button></button>
         </div>
       </div>
 
