@@ -72,6 +72,7 @@ function App() {
     setTitlesOnly(checked)
   }
 
+  const inputRef = useRef<HTMLInputElement>(null)
   const initializedRef = useRef(false)
 
   useLayoutEffect(() => {
@@ -95,6 +96,10 @@ function App() {
     }
 
     document.documentElement.classList.add(themeColor)
+  }, [])
+
+  useLayoutEffect(() => {
+    inputRef.current?.focus()
   }, [])
 
   let rendered: React.ReactNode = null
@@ -138,6 +143,7 @@ function App() {
             onChange={handleChange}
             value={searchText}
             placeholder="Enter text to search for"
+            ref={inputRef}
           />
         </div>
         <div className="mb-1 p-2">
