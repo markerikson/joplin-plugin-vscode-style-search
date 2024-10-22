@@ -203,7 +203,7 @@ function App() {
               icon="collapse"
               tooltip="Collapse All"
             />
-            <FilterButton active={false} toggle={() => listData.resultsUpdated()} icon="expand" tooltip="expand All" />
+            <FilterButton active={false} toggle={() => listData.resultsUpdated()} icon="expand" tooltip="Expand All" />
           </div>
         </div>
 
