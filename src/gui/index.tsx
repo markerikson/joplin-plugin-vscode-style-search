@@ -52,6 +52,7 @@ enum SortType {
   Relevance = 'Relevance',
   Updated = 'Updated',
   Matches = 'Matches',
+  NoteName = 'Note Name',
   FolderName = 'Folder Name',
 }
 
@@ -94,6 +95,7 @@ function App() {
     const direction = sortDirection === SortDirection.Ascending ? 'asc' : 'desc'
     const sortFields: Record<SortType, keyof NoteItemData> = {
       [SortType.FolderName]: 'folderTitle',
+      [SortType.NoteName]: 'title',
       [SortType.Matches]: 'matchCount',
       [SortType.Updated]: 'updated_time',
       // ignored
@@ -182,6 +184,7 @@ function App() {
             >
               <option value={SortType.Relevance}>Relevance</option>
               <option value={SortType.Matches}>Matches</option>
+              <option value={SortType.NoteName}>Note Name</option>
               <option value={SortType.FolderName}>Folder Name</option>
               <option value={SortType.Updated}>Updated</option>
             </select>
