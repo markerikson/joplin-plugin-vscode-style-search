@@ -1,6 +1,6 @@
 {
   "name": "joplin-plugin-vscode-style-search",
-  "version": "0.1.0",
+  "version": "0.2.1",
   "repository": "https://github.com/markerikson/joplin-plugin-vscode-style-search",
   "scripts": {
     "build": "RSPACK_CONFIG_VALIDATE=loose rspack --env joplin-plugin-config=buildMain && rspack --env joplin-plugin-config=buildExtraScripts && rspack --env joplin-plugin-config=createArchive",
