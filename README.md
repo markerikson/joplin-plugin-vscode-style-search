@@ -18,4 +18,4 @@ This is a brand-new plugin, and there's a lot of possible search options that co
 - Pagination
 - Switching to a view that shows each match with multiple lines of context above and below (similar to VS Code's "Show in Editor" popout panel)
 
-I may not hae much time to work on new features myself, but happy to accept PRs!
+I may not have much time to work on new features myself, but happy to accept PRs!

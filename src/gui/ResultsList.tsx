@@ -7,34 +7,39 @@ import { GenericList } from './GenericList'
 import type { ItemData } from './ResultsListRow'
 import ResultsListRow, { ITEM_SIZE } from './ResultsListRow'
 import styles from './ResultsList.module.css'
+import { Folder } from 'src'
 
 interface ResultsListProps {
   query: string
   status: 'pending' | 'resolved'
   results: NoteSearchItemData[]
+  folders: Folder[]
+  listData: NoteSearchListData
   titlesOnly: boolean
   openNote: (noteId: string, line?: number) => void
 }
 
-export default function ResultsList({ query, status, results, titlesOnly, openNote }: ResultsListProps) {
+export default function ResultsList({
+  query,
+  status,
+  results,
+  listData,
+  folders,
+  titlesOnly,
+  openNote,
+}: ResultsListProps) {
   const isPending = status === STATUS_PENDING
 
-  const listData = useMemo(() => new NoteSearchListData(results), [results])
-
-  useEffect(() => {
-    listData.resultsUpdated()
-  }, [listData, results, results.length])
-
-  const itemData = useMemo<ItemData>(
-    () => ({
+  const itemData = useMemo<ItemData>(() => {
+    return {
       listData,
       query,
       results,
+      folders,
       titlesOnly,
       openNote,
-    }),
-    [listData, query, results, openNote],
-  )
+    }
+  }, [listData, query, results, folders, openNote])
 
   if (status === STATUS_RESOLVED && results.length === 0) {
     return <div>No results found somehow!</div>

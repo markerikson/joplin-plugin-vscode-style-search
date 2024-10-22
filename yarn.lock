@@ -2123,6 +2123,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/lodash@npm:^4":
+  version: 4.17.0
+  resolution: "@types/lodash@npm:4.17.0"
+  checksum: 10c0/4c5b41c9a6c41e2c05d08499e96f7940bcf194dcfa84356235b630da920c2a5e05f193618cea76006719bec61c76617dff02defa9d29934f9f6a76a49291bd8f
+  languageName: node
+  linkType: hard
+
 "@types/mdast@npm:^3.0.0":
   version: 3.0.15
   resolution: "@types/mdast@npm:3.0.15"
@@ -6400,6 +6407,7 @@ __metadata:
     "@tailwindcss/forms": "npm:^0.5.7"
     "@types/fs-extra": "npm:^11.0.4"
     "@types/html-to-text": "npm:^9"
+    "@types/lodash": "npm:^4"
     "@types/node": "npm:^20.11.20"
     "@types/react": "npm:^18.2.55"
     "@types/react-dom": "npm:^18.2.19"
@@ -6413,6 +6421,7 @@ __metadata:
     glob: "npm:^8.0.3"
     html-to-text: "npm:^9.0.5"
     index-to-position: "npm:^1.0.0"
+    lodash: "npm:^4.17.21"
     marked: "npm:^12.0.0"
     postcss: "npm:^8.4.35"
     postcss-loader: "npm:^8.1.0"

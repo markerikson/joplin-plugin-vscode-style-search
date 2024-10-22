@@ -51,12 +51,23 @@ export interface Note {
   source: string
 }
 
-interface SearchResponse {
-  has_more: boolean
-  items: Note[]
+export interface Folder {
+  id: string
+  parent_id: string
+  title: string
 }
 
-async function searchNotes(queryOptions: SearchQueryOptions): Promise<Note[]> {
+interface SearchResponse<T> {
+  has_more: boolean
+  items: T[]
+}
+
+interface NotesSearchResults {
+  notes: Note[]
+  folders: Folder[]
+}
+
+async function searchNotes(queryOptions: SearchQueryOptions): Promise<NotesSearchResults> {
   let hasMore = false
   let allNotes: Note[] = []
   let page = 1
@@ -68,7 +79,7 @@ async function searchNotes(queryOptions: SearchQueryOptions): Promise<Note[]> {
   const fields = ['id', 'title', 'body', 'parent_id', 'is_todo', 'todo_completed', 'todo_due', 'order', 'created_time']
 
   while (true) {
-    const res: SearchResponse = await joplin.data.get(['search'], {
+    const res: SearchResponse<Note> = await joplin.data.get(['search'], {
       query,
       page,
       fields,
@@ -86,7 +97,12 @@ async function searchNotes(queryOptions: SearchQueryOptions): Promise<Note[]> {
     }
   }
 
-  return allNotes
+  const allFoldersResult: SearchResponse<Folder> = await joplin.data.get(['folders'], {})
+
+  return {
+    notes: allNotes,
+    folders: allFoldersResult.items,
+  }
 }
 
 async function setUpSearchPanel(panel: string) {

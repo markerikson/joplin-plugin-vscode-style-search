@@ -14,11 +14,13 @@ import HighlightMatch from './HighlightMatch'
 import { GenericListItemData } from './GenericList'
 
 import styles from './ResultsListRow.module.css'
+import { Folder } from 'src'
 
 export const ITEM_SIZE = 20
 
 export type ItemData = {
   listData: NoteSearchListData
+  folders: Folder[]
   query: string
   titlesOnly: boolean
   openNote: (noteId: string, line?: number) => void
@@ -36,7 +38,7 @@ export default function ResultsListItem({
   const { itemData, listData: genericListData } = data
 
   const listData = genericListData as NoteSearchListData
-  const { openNote, titlesOnly } = itemData
+  const { openNote, titlesOnly, folders } = itemData
   const { isCollapsed, result } = listData.getItemAtIndex(index)
 
   if (isNoteItem(result)) {
@@ -47,6 +49,7 @@ export default function ResultsListItem({
         listData={listData}
         titlesOnly={titlesOnly}
         result={result}
+        folders={folders}
         style={style}
         openNote={openNote}
       />
@@ -64,6 +67,7 @@ function LocationRow({
   listData,
   titlesOnly,
   result,
+  folders,
   style,
   openNote,
 }: {
@@ -72,10 +76,11 @@ function LocationRow({
   listData: NoteSearchListData
   titlesOnly: boolean
   result: NoteItemData
+  folders: Folder[]
   style: CSSProperties
   openNote: (noteId: string, line?: number) => void
 }) {
-  const { id, title, matchCount } = result
+  const { id, title, matchCount, note } = result
 
   const handleOpenNoteClicked = (e: React.MouseEvent) => {
     e.preventDefault()
@@ -83,10 +88,14 @@ function LocationRow({
     openNote(result.id)
   }
 
+  const parentFolder = folders.find((folder) => folder.id === note.parent_id)
+  const parentFolderTitle = parentFolder?.title ?? ''
+
   const noteHeaderContent = (
     <>
       <Icon className={styles.LocationIcon} type="file" />
       <div className={styles.Location} title={title}>
+        {parentFolderTitle ? `${parentFolderTitle} > ` : null}
         {title}
       </div>
       {titlesOnly ? null : (
@@ -112,8 +121,8 @@ function LocationRow({
         defaultOpen={titlesOnly ? false : !isCollapsed}
         header={noteHeaderContent}
         headerClassName={styles.LocationRow}
-        key={id /* Re-apply defaultCollapsed if row content changes */}
-        onChange={(collapsed) => listData.toggleCollapsed(index, !collapsed)}
+        key={id + isCollapsed.toString() /* Re-apply defaultCollapsed if row content changes */}
+        onChange={(collapsed) => listData.setCollapsed(index, !collapsed)}
       />
     )
   }
