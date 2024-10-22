@@ -1,11 +1,16 @@
 import { marked } from 'marked'
 import { convert as htmlToText } from 'html-to-text'
-import { NoteSearchItemData } from './NoteSearchListData'
+import { FragmentItemData, NoteItemData, NoteSearchItemData } from './NoteSearchListData'
 import { ComplexTerm } from './searchProcessing'
-import { Note } from 'src'
+import { Folder, Note } from 'src'
 import indexToPosition from 'index-to-position'
 
 export const parsedNoteBodies = new Map<string, string>()
+
+export interface ParsedNote {
+  noteItem: NoteItemData
+  fragmentItems: FragmentItemData[]
+}
 
 export const parseNoteBody = (noteBody: string) => {
   const htmlContent = marked.parse(noteBody) as string
@@ -38,9 +43,9 @@ export function previousWhitespaceIndex(s: string, begin: number) {
 export const parseNote = (
   note: Note,
   parsedKeywords: (string | ComplexTerm)[],
+  folders: Folder[],
   titlesOnly: boolean,
-): NoteSearchItemData[] => {
-  const results: NoteSearchItemData[] = []
+): ParsedNote | null => {
   const fragmentMatches: { fragment: string; line: number }[] = []
 
   const strippedContent = getParsedNoteBody(note.body)
@@ -78,24 +83,36 @@ export const parseNote = (
   }
 
   if (titlesOnly || fragmentMatches.length) {
-    results.push({
+    const folder = folders.find((folder) => folder.id === note.parent_id)
+    const folderTitle = folder?.title ?? ''
+    const noteItem: NoteItemData = {
       type: 'note',
       id: note.id,
       note,
       title: note.title,
+      updated_time: note.updated_time,
+      folderTitle,
       matchCount: fragmentMatches.length,
+    }
+
+    const fragmentItems = fragmentMatches.map((match, index) => {
+      const fragmentItem: FragmentItemData = {
+        type: 'fragment',
+        id: `${note.id}-${index}`,
+        noteId: note.id,
+        fragment: match.fragment,
+        line: match.line,
+      }
+      return fragmentItem
     })
+
+    const parsedNote: ParsedNote = {
+      noteItem,
+      fragmentItems,
+    }
+
+    return parsedNote
   }
 
-  for (const [index, match] of fragmentMatches.entries()) {
-    results.push({
-      type: 'fragment',
-      id: `${note.id}-${index}`,
-      noteId: note.id,
-      fragment: match.fragment,
-      line: match.line,
-    })
-  }
-
-  return results
+  return null
 }

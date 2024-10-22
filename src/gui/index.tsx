@@ -4,6 +4,7 @@ import * as ReactDOM from 'react-dom/client'
 
 import { useAsync } from 'react-use'
 import classnames from 'classnames'
+import orderBy from 'lodash/orderBy'
 
 import { ChannelClient, ChannelErrors, PostMessageTarget } from '../shared/channelRpc'
 
@@ -13,8 +14,8 @@ import './tailwind.css'
 import './variables.css'
 import searchStyles from './SearchFiles.module.css'
 import { keywords } from './searchProcessing'
-import { parseNote } from './noteParsings'
-import { NoteSearchItemData, NoteSearchListData } from './NoteSearchListData'
+import { ParsedNote, parseNote } from './noteParsings'
+import { isFragmentItem, NoteItemData, NoteSearchItemData, NoteSearchListData } from './NoteSearchListData'
 import ResultsList from './ResultsList'
 import { FilterButton } from './FilterButton'
 
@@ -45,11 +46,25 @@ const client = new ChannelClient<HandlerType>({
   timeout: 10000,
 })
 
-const NO_RESULTS: NoteSearchItemData[] = []
+const NO_RESULTS: ParsedNote[] = []
+
+enum SortType {
+  Relevance = 'Relevance',
+  Updated = 'Updated',
+  Matches = 'Matches',
+  FolderName = 'Folder Name',
+}
+
+enum SortDirection {
+  Ascending = 'Ascending',
+  Descending = 'Descending',
+}
 
 function App() {
   const [searchText, setSearchText] = useState('')
   const [titlesOnly, setTitlesOnly] = useState(false)
+  const [sortType, setSortType] = useState(SortType.Relevance)
+  const [sortDirection, setSortDirection] = useState(SortDirection.Descending)
 
   const {
     value: searchResults,
@@ -60,20 +75,42 @@ function App() {
     let noteListData: NoteSearchItemData[] = []
     let notes: Note[] = []
     let folders: Folder[] = []
+    let parsedNotes: ParsedNote[] = []
     if (searchText) {
       const searchResult = await client.stub.search({ searchText: searchText, titlesOnly })
       notes = searchResult.notes
       folders = searchResult.folders
 
-      noteListData = notes.map((note) => parseNote(note, parsedKeywords, titlesOnly)).flat()
+      parsedNotes = notes.map((note) => parseNote(note, parsedKeywords, folders, titlesOnly)).filter(Boolean)
     }
 
-    return { notes, noteListData, folders }
+    return { notes, noteListData, parsedNotes, folders }
   }, [searchText, titlesOnly])
 
-  const results = searchResults?.noteListData ?? NO_RESULTS
+  const parsedNoteResults = searchResults?.parsedNotes ?? NO_RESULTS
 
-  const listData = useMemo(() => new NoteSearchListData(results), [results])
+  const [listData, results, sortedResults] = useMemo(() => {
+    let sortedResults = parsedNoteResults
+    const direction = sortDirection === SortDirection.Ascending ? 'asc' : 'desc'
+    const sortFields: Record<SortType, keyof NoteItemData> = {
+      [SortType.FolderName]: 'folderTitle',
+      [SortType.Matches]: 'matchCount',
+      [SortType.Updated]: 'updated_time',
+      // ignored
+      [SortType.Relevance]: 'id',
+    }
+
+    if (sortType !== SortType.Relevance) {
+      const sortField = sortFields[sortType]
+      sortedResults = orderBy(parsedNoteResults, (r) => r.noteItem[sortField], [direction])
+    }
+
+    const finalSortedResults = sortedResults.map((parsedNote) => [parsedNote.noteItem, ...parsedNote.fragmentItems])
+    const flattenedResults: NoteSearchItemData[] = finalSortedResults.flat()
+
+    const noteListData = new NoteSearchListData(flattenedResults)
+    return [noteListData, flattenedResults, sortedResults] as const
+  }, [parsedNoteResults, sortType, sortDirection])
 
   useEffect(() => {
     listData.resultsUpdated()
@@ -125,15 +162,38 @@ function App() {
     rendered = 'Enter a search term'
   } else if (loading) {
     rendered = 'Loading...'
-  } else if (searchResults.noteListData.length === 0) {
+  } else if (searchResults.parsedNotes.length === 0) {
     rendered = 'No results found'
   } else {
+    const totalMatches = results.filter((r) => isFragmentItem(r)).length
+    // https://flowbite.com/docs/forms/select/
+    const selectClassname =
+      'bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-1 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 min-w-28'
+
     rendered = (
       <>
         <div className="flex justify-between">
-          <h3 className="mb-2  font-bold">Results</h3>
+          <h3 className="mb-2 text-lg font-bold">Results</h3>
           <div className="flex">
-            {' '}
+            <select
+              value={sortType}
+              onChange={(e) => setSortType(e.target.value as SortType)}
+              className={selectClassname}
+            >
+              <option value={SortType.Relevance}>Relevance</option>
+              <option value={SortType.Matches}>Matches</option>
+              <option value={SortType.FolderName}>Folder Name</option>
+              <option value={SortType.Updated}>Updated</option>
+            </select>
+            <select
+              value={sortDirection}
+              onChange={(e) => setSortDirection(e.target.value as SortDirection)}
+              disabled={sortType === SortType.Relevance}
+              className={selectClassname}
+            >
+              <option value={SortDirection.Ascending}>Ascending</option>
+              <option value={SortDirection.Descending}>Descending</option>
+            </select>
             <FilterButton
               active={false}
               toggle={() => listData.setAllCollapsed()}
@@ -145,7 +205,7 @@ function App() {
         </div>
 
         <div className="mb-1">
-          {searchResults.noteListData.length} results in {searchResults.notes.length} notes
+          {totalMatches} matches in {searchResults.notes.length} notes
         </div>
         <div className="grow">
           <ResultsList

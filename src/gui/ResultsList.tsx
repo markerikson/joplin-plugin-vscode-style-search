@@ -30,17 +30,16 @@ export default function ResultsList({
 }: ResultsListProps) {
   const isPending = status === STATUS_PENDING
 
-  const itemData = useMemo<ItemData>(
-    () => ({
+  const itemData = useMemo<ItemData>(() => {
+    return {
       listData,
       query,
       results,
       folders,
       titlesOnly,
       openNote,
-    }),
-    [listData, query, results, folders, openNote],
-  )
+    }
+  }, [listData, query, results, folders, openNote])
 
   if (status === STATUS_RESOLVED && results.length === 0) {
     return <div>No results found somehow!</div>

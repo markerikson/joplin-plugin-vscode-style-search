@@ -16,6 +16,8 @@ export type NoteItemData = {
   id: string
   note: Note
   title: string
+  updated_time: number
+  folderTitle: string
   matchCount: number
 }
 
